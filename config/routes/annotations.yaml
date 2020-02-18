@@ -1,6 +1,9 @@
 controllers:
     resource: ../../src/Controller/
     type: annotation
+    schemes:
+        - HTTP
+        - HTTPS
 
 kernel:
     resource: ../../src/Kernel.php
