@@ -30,7 +30,7 @@ class AppAuthenticationAuthenticator extends AbstractFormLoginAuthenticator impl
 {
     use TargetPathTrait;
 
-    public const LOGIN_ROUTE = 'app_login';
+    public const LOGIN_ROUTE = 'app_auth_login';
 
     private EntityManagerInterface $entityManager;
     private UrlGeneratorInterface $urlGenerator;

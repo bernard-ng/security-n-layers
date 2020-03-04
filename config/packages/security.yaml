@@ -21,8 +21,8 @@ security:
                 authenticators:
                     - App\Security\AppAuthenticationAuthenticator
             logout:
-                path: app_logout
-                target: app_login
+                path: app_auth_logout
+                target: app_auth_login
             remember_me:
                 path: /
                 secret: '%kernel.secret%'

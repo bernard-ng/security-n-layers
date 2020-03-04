@@ -15,11 +15,11 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class LoginController extends AbstractController
 {
     /**
-     * @Route("/login", name="app_login", methods={"GET", "POST"})
+     * @Route("/auth/login", name="app_auth_login", methods={"GET", "POST"})
      * @param AuthenticationUtils $authenticationUtils
      * @return Response
      */
-    public function login(AuthenticationUtils $authenticationUtils): Response
+    public function __invoke(AuthenticationUtils $authenticationUtils): Response
     {
         if ($this->getUser()) {
             return $this->redirectToRoute('app_home');
@@ -31,7 +31,7 @@ class LoginController extends AbstractController
     }
 
     /**
-     * @Route("/logout", name="app_logout", methods={"GET"})
+     * @Route("/auth/logout", name="app_auth_logout", methods={"GET"})
      */
     public function logout()
     {
