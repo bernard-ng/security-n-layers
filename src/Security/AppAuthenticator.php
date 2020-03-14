@@ -3,7 +3,9 @@
 namespace App\Security;
 
 use App\Entity\User;
+use App\Event\Security\AuthenticationSuccessEvent;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +28,7 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
  * @package App\Security
  * @author bernard-ng <ngandubernard@gmail.com>
  */
-class AppAuthenticationAuthenticator extends AbstractFormLoginAuthenticator implements PasswordAuthenticatedInterface
+class AppAuthenticator extends AbstractFormLoginAuthenticator implements PasswordAuthenticatedInterface
 {
     use TargetPathTrait;
 
@@ -36,6 +38,8 @@ class AppAuthenticationAuthenticator extends AbstractFormLoginAuthenticator impl
     private UrlGeneratorInterface $urlGenerator;
     private CsrfTokenManagerInterface $csrfTokenManager;
     private UserPasswordEncoderInterface $passwordEncoder;
+    private EventDispatcherInterface $eventDispatcher;
+    private UserProviderInterface $userProvider;
 
     /**
      * AppAuthenticationAuthenticator constructor.
@@ -43,17 +47,23 @@ class AppAuthenticationAuthenticator extends AbstractFormLoginAuthenticator impl
      * @param UrlGeneratorInterface $urlGenerator
      * @param CsrfTokenManagerInterface $csrfTokenManager
      * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param UserProviderInterface $userProvider
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         UrlGeneratorInterface $urlGenerator,
         CsrfTokenManagerInterface $csrfTokenManager,
-        UserPasswordEncoderInterface $passwordEncoder
+        UserPasswordEncoderInterface $passwordEncoder,
+        EventDispatcherInterface $eventDispatcher,
+        UserProviderInterface $userProvider
     ) {
         $this->entityManager = $entityManager;
         $this->urlGenerator = $urlGenerator;
         $this->csrfTokenManager = $csrfTokenManager;
         $this->passwordEncoder = $passwordEncoder;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->userProvider = $userProvider;
     }
 
     /**
@@ -100,11 +110,13 @@ class AppAuthenticationAuthenticator extends AbstractFormLoginAuthenticator impl
             throw new InvalidCsrfTokenException();
         }
 
+        /** @var User $user */
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $credentials['email']]);
 
         if (!$user) {
-            // fail authentication with a custom error
             throw new CustomUserMessageAuthenticationException('Email could not be found.');
+        } elseif (is_null($user->getAccountConfirmedAt())) {
+            throw new CustomUserMessageAuthenticationException('Please, check your email to confirm your account');
         }
 
         return $user;
@@ -141,6 +153,9 @@ class AppAuthenticationAuthenticator extends AbstractFormLoginAuthenticator impl
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
+        $user = $this->getUser($this->getCredentials($request), $this->userProvider);
+        $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($request, $user));
+
         if ($targetPath = $this->getTargetPath($request->getSession(), $providerKey)) {
             return new RedirectResponse($targetPath);
         }

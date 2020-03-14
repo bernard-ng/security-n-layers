@@ -2,8 +2,11 @@
 
 namespace App\Entity;
 
+use App\Entity\Security\Login;
 use DateTime;
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -109,12 +112,18 @@ class User implements UserInterface
     private ?DateTimeInterface $updated_at = null;
 
     /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Security\Login", mappedBy="user", orphanRemoval=true)
+     */
+    private Collection $logins;
+
+    /**
      * User constructor.
      */
     public function __construct()
     {
         $this->created_at = new DateTime();
         $this->uid = uniqid("sc_");
+        $this->logins = new ArrayCollection();
     }
 
     /**
@@ -483,6 +492,47 @@ class User implements UserInterface
     public function setIsCertified(bool $is_certified): self
     {
         $this->is_certified = $is_certified;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Login[]
+     */
+    public function getLogins(): Collection
+    {
+        return $this->logins;
+    }
+
+    /**
+     * @param Login $login
+     * @return $this
+     * @author bernard-ng <ngandubernard@gmail.com>
+     */
+    public function addLogin(Login $login): self
+    {
+        if (!$this->logins->contains($login)) {
+            $this->logins[] = $login;
+            $login->setUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Login $login
+     * @return $this
+     * @author bernard-ng <ngandubernard@gmail.com>
+     */
+    public function removeLogin(Login $login): self
+    {
+        if ($this->logins->contains($login)) {
+            $this->logins->removeElement($login);
+            // set the owning side to null (unless already changed)
+            if ($login->getUser() === $this) {
+                $login->setUser(null);
+            }
+        }
 
         return $this;
     }

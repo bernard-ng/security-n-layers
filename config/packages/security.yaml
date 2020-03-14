@@ -19,7 +19,7 @@ security:
             provider: app_user_provider
             guard:
                 authenticators:
-                    - App\Security\AppAuthenticationAuthenticator
+                    - App\Security\AppAuthenticator
             logout:
                 path: app_auth_logout
                 target: app_auth_login
