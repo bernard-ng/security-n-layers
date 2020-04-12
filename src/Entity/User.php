@@ -49,7 +49,7 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private ?array $roles = [];
+    private ?string $roles = "ROLE_USER";
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -173,6 +173,15 @@ class User implements UserInterface
     {
         $roles = explode('|', "ROLE_USER|{$this->roles}");
         return array_unique($roles);
+    }
+
+    /**
+     * @return string
+     * @author bernard-ng <ngandubernard@gmail.com>
+     */
+    public function getRolesAsString(): string
+    {
+        return implode('|', $this->getRoles());
     }
 
     /**
