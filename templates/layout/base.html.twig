@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+<head>
+    <title>Souvenir Cloud</title>
+    {% include "includes/_meta.html.twig" %}
+    {{ encore_entry_link_tags('app') }}
+</head>
+<body data-route="{{ app.request.get("_route") }}">
+{% include "includes/_menu.html.twig" %}
+
+<main id="page-content" role="main">
+    {% block body %}{% endblock %}
+</main>
+
+{% include 'includes/_footer.html.twig' %}
+{{ encore_entry_script_tags('app') }}
+</body>
+</html>

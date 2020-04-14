@@ -1,16 +1,18 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Register{% endblock %}
+{% extends 'layout/base.html.twig' %}
 
 {% block body %}
-    <h1>Register</h1>
+   <div class="container">
+       <div class="card-panel">
+           <h1>Register</h1>
 
-    {{ form_start(form) }}
-        {{ form_row((form.name)) }}
-        {{ form_row(form.email) }}
-        {{ form_row(form.plainPassword) }}
-        {{ form_row(form.agreeTerms) }}
+           {{ form_start(form) }}
+           {{ form_row((form.name)) }}
+           {{ form_row(form.email) }}
+           {{ form_row(form.plainPassword) }}
+           {{ form_row(form.agreeTerms) }}
 
-        <button class="btn">Register</button>
-    {{ form_end(form) }}
+           <button class="btn">Register</button>
+           {{ form_end(form) }}
+       </div>
+   </div>
 {% endblock %}

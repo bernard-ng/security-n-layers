@@ -1,0 +1,47 @@
+<header>
+    <div class="navbar-fixed">
+        <nav>
+            <div class="nav-wrapper container " id="menu">
+                <a href="{{ path('app_home') }}" class="brand-logo">
+                    SouvenirCloud
+                </a>
+
+                <a href="/search" class="action right">
+                    <i class="icon icon icon-search"></i>
+                </a>
+
+                <a href="#" data-activates="mobile-menu" class="button-collapse left">
+                    <i class="icon icon icon-menu"></i>
+                </a>
+
+                <span id="menu-item-active"></span>
+                <ul class="right hide-on-med-and-down links">
+                    <li id="Galerie" class="waves-effect"><a href=""> Explore</a></li>
+                    <li id="Blog" class="waves-effect"><a href=""> Gallery</a></li>
+                    <li class="waves-effect"><a href=""> Archive</a></li>
+
+                    <li id="service" class="waves-effect">
+                        <a href="#" class="services-slideNav" data-activates="services-actions">
+                            <span class="material-icons">menu</span>
+                        </a>
+                    </li>
+                    {% if not app.user %}
+                        <li>
+                            <a href="{{ path('app_auth_login') }}" class="btn waves-effect">
+                                Connexion
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+    </div>
+    <ul class="sidenav" id="services-actions">
+        <li><a href="/categories">Catégories<i class="icon icon-tags"></i></a></li>
+        <li><a href="/community">La Communauté <i class="icon icon-users"></i></a></li>
+        <li><a href="/contact">Nous contacter <i class="icon icon-mail"></i></a></li>
+        <li><a href="/bugs">Signaler un problème<i class="icon icon-tags"></i></a></li>
+        <li><a href="/ideas">Donner un avis<i class="icon icon-location"></i></a></li>
+        <li><a href="/privacy">Politique d'utilisation <i class="icon icon-camera"></i></a></li>
+    </ul>
+</header>

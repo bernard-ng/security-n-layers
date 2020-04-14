@@ -16,7 +16,7 @@
   backface-visibility: hidden;
   transform: translateX(-105%);
 
-  @extend .z-depth-1;
+  @extend .z-depth-2;
 
   // Right Align
   &.right-aligned {
@@ -86,7 +86,7 @@
 
     cursor: initial;
     pointer-events: none;
-    color: rgba(0,0,0,.54);
+    color: $secondary-color;
     font-size: $sidenav-font-size;
     font-weight: 500;
     line-height: $sidenav-line-height;
