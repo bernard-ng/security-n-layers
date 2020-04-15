@@ -19,12 +19,6 @@
                     <li id="Galerie" class="waves-effect"><a href=""> Explore</a></li>
                     <li id="Blog" class="waves-effect"><a href=""> Gallery</a></li>
                     <li class="waves-effect"><a href=""> Archive</a></li>
-
-                    <li id="service" class="waves-effect">
-                        <a href="#" class="services-slideNav" data-activates="services-actions">
-                            <span class="material-icons">menu</span>
-                        </a>
-                    </li>
                     {% if not app.user %}
                         <li>
                             <a href="{{ path('app_auth_login') }}" class="btn waves-effect">

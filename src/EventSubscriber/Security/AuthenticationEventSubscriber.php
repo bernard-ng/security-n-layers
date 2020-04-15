@@ -3,11 +3,13 @@
 namespace App\EventSubscriber\Security;
 
 use App\Entity\Security\Login;
+use App\Event\Security\PasswordResetTokenCreatedEvent;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use App\Event\Security\AccountRegisteredEvent;
 use App\Event\Security\AuthenticationSuccessEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 
 /**
@@ -38,7 +40,8 @@ class AuthenticationEventSubscriber implements EventSubscriberInterface
     {
         return [
             AuthenticationSuccessEvent::class => 'onAuthenticationSuccess',
-            AccountRegisteredEvent::class => 'onAccountRegistered'
+            AccountRegisteredEvent::class => 'onAccountRegistered',
+            PasswordResetTokenCreatedEvent::class => 'onPasswordResetTokenCreated',
         ];
     }
 
@@ -71,7 +74,21 @@ class AuthenticationEventSubscriber implements EventSubscriberInterface
             ->setDevice("-")
             ->setUser($event->getUser());
 
+        // TODO: Save Location and Device for each Login
         $this->manager->persist($login);
         $this->manager->flush();
+    }
+
+    /**
+     * @param PasswordResetTokenCreatedEvent $event
+     * @param UrlGeneratorInterface $urlGenerator
+     * @author bernard-ng <ngandubernard@gmail.com>
+     */
+    public function onPasswordResetTokenCreated(
+        PasswordResetTokenCreatedEvent $event,
+        UrlGeneratorInterface $urlGenerator
+    ): void {
+        $url = $urlGenerator->generate('app_auth_password_reset', ['token' => $event->getToken()]);
+        $user = $event->getUser();
     }
 }

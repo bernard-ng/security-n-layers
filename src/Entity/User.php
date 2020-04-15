@@ -545,4 +545,26 @@ class User implements UserInterface
 
         return $this;
     }
+
+    /**
+     * @return $this
+     * @author bernard-ng <ngandubernard@gmail.com>
+     */
+    public function setAccountConfirmed(): self
+    {
+        $this->setAccountConfirmationToken(null);
+        $this->setAccountConfirmedAt(new DateTime());
+        return $this;
+    }
+
+    /**
+     * @param string $encodePassword
+     * @author bernard-ng <ngandubernard@gmail.com>
+     */
+    public function resetPassword(string $encodePassword)
+    {
+        $this->setPasswordResetToken(null);
+        $this->setPasswordResetAt(new DateTime());
+        $this->setPassword($encodePassword);
+    }
 }
