@@ -19,9 +19,6 @@ use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
  */
 class AuthenticationService
 {
-
-    private const PASSWORD_RESET_ROUTE = 'app_auth_password_reset';
-
     private EntityManagerInterface $manager;
     private EventDispatcherInterface $eventDispatcher;
     private TokenGeneratorInterface $tokenGenerator;
@@ -48,8 +45,7 @@ class AuthenticationService
         UserPasswordEncoderInterface $passwordEncoder,
         UserRepository $repository,
         LoggerInterface $logger
-    )
-    {
+    ) {
         $this->manager = $manager;
         $this->eventDispatcher = $eventDispatcher;
         $this->tokenGenerator = $tokenGenerator;

@@ -49,7 +49,7 @@ class RegistrationController extends AbstractController
 
 
     /**
-     * @Route("/auth/register/confirm/:token", name="app_auth_register_confirm", methods={"GET"})
+     * @Route("/auth/register/confirm/{token}", name="app_auth_register_confirm", methods={"GET"})
      * @param Request $request
      * @param string $token
      * @param UserRepository $repository

@@ -41,6 +41,7 @@ class ResetPasswordController extends AbstractController
     }
 
     /**
+     * @Route("/auth/password/reset", name="app_auth_password_reset", methods={"GET", "POST"})
      * @param Request $request
      * @return Response
      * @author bernard-ng <ngandubernard@gmail.com>
@@ -68,7 +69,7 @@ class ResetPasswordController extends AbstractController
     }
 
     /**
-     * @Route("/auth/password/reset/{id}/{token}", name="app_auth_password_reset", methods={"GET"})
+     * @Route("/auth/password/reset/{id}/{token}", name="app_auth_password_reset_confirm", methods={"GET"})
      * @param Request $request
      * @param User $user
      * @param PasswordResetToken $token
@@ -77,7 +78,7 @@ class ResetPasswordController extends AbstractController
      */
     public function reset(Request $request, User $user, PasswordResetToken $token): Response
     {
-        if ($token->isExpiry() && $token->getUser() !== $user) {
+        if ($token->isExpiry() || $token->getUser() !== $user) {
             $this->addFlash('error', 'auth.account.password.expiredToken');
             return $this->redirectToRoute('app_auth_login');
         }
