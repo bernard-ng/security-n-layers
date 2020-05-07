@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Service\Security;
@@ -85,19 +86,29 @@ class PasswordResetService
      * @param User $user
      * @param PasswordResetToken $token
      * @param PasswordResetConfirmData $data
-     * @throws InvalidTokenException
+     * @throws TokenNotFoundException
+     * @throws TokenExpiredException
      * @author bernard-ng <ngandubernard@gmail.com>
      */
     public function confirm(User $user, PasswordResetToken $token, PasswordResetConfirmData $data): void
     {
-        $token = $this->tokenRepository->findOneBy(['user' => $user]);
-        if ($token) {
+        $expectedToken = $this->tokenRepository->findOneBy(['user' => $user]);
+
+        if ($expectedToken && $expectedToken === $token) {
+            if ($token->isExpiried() || $token->getUser() !== $user) {
+                $this->manager->remove($token);
+                $this->manager->flush();
+                throw  new TokenExpiredException(
+                    sprintf("The token %s is expired", $token->getToken())
+                );
+            }
+
             $user->setPassword($this->passwordEncoder->encodePassword($user, $data->password));
             $this->manager->remove($token);
             $this->manager->persist($user);
             $this->manager->flush();
         } else {
-            throw new InvalidTokenException(
+            throw new TokenNotFoundException(
                 sprintf("The token %s is not a valid one", $token->getToken())
             );
         }

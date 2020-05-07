@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Event\Security;
@@ -48,9 +49,9 @@ class PasswordResetConfirmEvent
     }
 
     /**
-     * @return mixed
+     * @return PasswordResetConfirmData
      */
-    public function getData()
+    public function getData(): PasswordResetConfirmData
     {
         return $this->data;
     }

@@ -7,13 +7,10 @@ use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Security\PasswordResetTokenRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\Security\EmailVerificationRepository")
  */
-class PasswordResetToken
+class EmailVerification
 {
-
-    public const EXPIRY_IN = 30; // time in minutes
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -24,35 +21,27 @@ class PasswordResetToken
     /**
      * @ORM\Column(type="string", length=255)
      */
+    private ?string $email = null;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
     private ?string $token = null;
 
     /**
      * @ORM\Column(type="datetime")
      */
-    private ?DateTimeInterface $expiry_at = null;
+    private ?DateTimeInterface $created_at = null;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity="App\Entity\User")
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private ?User $user = null;
 
-    /**
-     * PasswordResetToken constructor.
-     * @throws \Exception
-     */
     public function __construct()
     {
-        $this->expiry_at = new \DateTime('+' . self::EXPIRY_IN . ' minutes');
-    }
-
-    /**
-     * @return bool
-     * @author bernard-ng <ngandubernard@gmail.com>
-     */
-    public function isExpiried(): bool
-    {
-        return $this->getExpiryAt() < new \DateTime('now');
+        $this->created_at = new \DateTime();
     }
 
     /**
@@ -62,6 +51,69 @@ class PasswordResetToken
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    /**
+     * @return string|null
+     * @author bernard-ng <ngandubernard@gmail.com>
+     */
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param string $email
+     * @return $this
+     * @author bernard-ng <ngandubernard@gmail.com>
+     */
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * @return DateTimeInterface|null
+     * @author bernard-ng <ngandubernard@gmail.com>
+     */
+    public function getCreatedAt(): ?DateTimeInterface
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * @param DateTimeInterface $created_at
+     * @return $this
+     * @author bernard-ng <ngandubernard@gmail.com>
+     */
+    public function setCreatedAt(DateTimeInterface $created_at): self
+    {
+        $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    /**
+     * @return User|null
+     * @author bernard-ng <ngandubernard@gmail.com>
+     */
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param User|null $user
+     * @return $this
+     * @author bernard-ng <ngandubernard@gmail.com>
+     */
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
     }
 
     /**
@@ -81,48 +133,6 @@ class PasswordResetToken
     public function setToken(string $token): self
     {
         $this->token = $token;
-
-        return $this;
-    }
-
-    /**
-     * @return DateTimeInterface|null
-     * @author bernard-ng <ngandubernard@gmail.com>
-     */
-    public function getExpiryAt(): ?DateTimeInterface
-    {
-        return $this->expiry_at;
-    }
-
-    /**
-     * @param DateTimeInterface $expiry_at
-     * @return $this
-     * @author bernard-ng <ngandubernard@gmail.com>
-     */
-    public function setExpiryAt(DateTimeInterface $expiry_at): self
-    {
-        $this->expiry_at = $expiry_at;
-
-        return $this;
-    }
-
-    /**
-     * @return User|null
-     * @author bernard-ng <ngandubernard@gmail.com>
-     */
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    /**
-     * @param User $user
-     * @return $this
-     * @author bernard-ng <ngandubernard@gmail.com>
-     */
-    public function setUser(User $user): self
-    {
-        $this->user = $user;
 
         return $this;
     }

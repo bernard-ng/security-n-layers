@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Service\Security;
 
 /**
- * Class UserNotFoundException
+ * Class TokenExpiredException
+ * @package App\Service\Security
  * @author bernard-ng <ngandubernard@gmail.com>
  */
-class UserNotFoundException extends \Exception
+class TokenExpiredException extends \Exception
 {
 
 }

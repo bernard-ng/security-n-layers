@@ -1,32 +1,32 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Controller\Security;
 
-use App\Entity\Security\PasswordResetToken;
 use App\Entity\User;
-use App\Event\Security\PasswordResetConfirmEvent;
-use App\Event\Security\PasswordResetRequestEvent;
-use App\Repository\UserRepository;
-use App\Data\Security\PasswordResetConfirmData;
-use App\Service\Security\InvalidTokenException;
-use App\Service\Security\UserNotFoundException;
+use App\Entity\Security\PasswordResetToken;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use App\Data\Security\PasswordResetConfirmData;
+use App\Service\Security\TokenExpiredException;
+use App\Service\Security\UserNotFoundException;
+use App\Service\Security\TokenNotFoundException;
 use App\Data\Security\PasswordResetRequestData;
 use App\Form\Security\PasswordResetConfirmType;
 use App\Form\Security\PasswordResetRequestType;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use App\Event\Security\PasswordResetRequestEvent;
+use App\Event\Security\PasswordResetConfirmEvent;
 
 /**
  * Class ResetPasswordController
  * @package App\Controller\Security
  * @author bernard-ng <ngandubernard@gmail.com>
  */
-class ResetPasswordController extends AbstractController
+class PasswordResetController extends AbstractController
 {
 
     private EventDispatcherInterface $eventDispatcher;
@@ -78,11 +78,6 @@ class ResetPasswordController extends AbstractController
      */
     public function reset(Request $request, User $user, PasswordResetToken $token): Response
     {
-        if ($token->isExpiry() || $token->getUser() !== $user) {
-            $this->addFlash('error', 'auth.account.password.expiredToken');
-            return $this->redirectToRoute('app_auth_login');
-        }
-
         try {
             $data = new PasswordResetConfirmData();
             $form = $this->createForm(PasswordResetConfirmType::class, $data);
@@ -97,8 +92,11 @@ class ResetPasswordController extends AbstractController
             return $this->render('security/password_reset_confirm.html.twig', [
                 'form' => $form->createView()
             ]);
-        } catch (InvalidTokenException $e) {
+        } catch (TokenNotFoundException $e) {
             $this->addFlash('error', 'auth.account.password.invalidToken');
+        } catch (TokenExpiredException $e) {
+            $this->addFlash('error', 'auth.account.password.expiredToken');
+        } finally {
             return $this->redirectToRoute('app_auth_login');
         }
     }

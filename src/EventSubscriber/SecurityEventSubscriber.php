@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\EventSubscriber;
@@ -8,9 +9,10 @@ use App\Event\Security\PasswordResetRequestEvent;
 use App\Service\Security\AuthenticationService;
 use App\Event\Security\AccountRegisteredEvent;
 use App\Event\Security\AuthenticationSuccessEvent;
-use App\Service\Security\InvalidTokenException;
+use App\Service\Security\TokenNotFoundException;
 use App\Service\Security\LoginService;
 use App\Service\Security\PasswordResetService;
+use App\Service\Security\TokenExpiredException;
 use App\Service\Security\UserNotFoundException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -57,7 +59,8 @@ class SecurityEventSubscriber implements EventSubscriberInterface
     /**
      * @param PasswordResetConfirmEvent $event
      * @param PasswordResetService $service
-     * @throws InvalidTokenException
+     * @throws TokenExpiredException
+     * @throws TokenNotFoundException
      * @author bernard-ng <ngandubernard@gmail.com>
      */
     public function onPasswordResetConfirm(PasswordResetConfirmEvent $event, PasswordResetService $service): void
