@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @package App\Form\Security
  * @author bernard-ng <ngandubernard@gmail.com>
  */
-class PasswordResetConfirmType extends AbstractType
+class PasswordResetConfirmForm extends AbstractType
 {
 
     /**

@@ -11,13 +11,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- * @UniqueEntity("email")
- * @UniqueEntity("name")
  */
 class User implements UserInterface
 {
@@ -73,16 +70,6 @@ class User implements UserInterface
      * )
      */
     private ?string $avatar_url = null;
-
-    /**
-     * @ORM\Column(type="string", length=70, nullable=true)
-     */
-    private ?string $account_confirmation_token = null;
-
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private ?DateTimeInterface $account_confirmed_at = null;
 
     /**
      * @ORM\Column(type="boolean", options={"default": 0})
@@ -294,48 +281,6 @@ class User implements UserInterface
     }
 
     /**
-     * @return string|null
-     * @author bernard-ng <ngandubernard@gmail.com>
-     */
-    public function getAccountConfirmationToken(): ?string
-    {
-        return $this->account_confirmation_token;
-    }
-
-    /**
-     * @param string|null $confirmation_token
-     * @return $this
-     * @author bernard-ng <ngandubernard@gmail.com>
-     */
-    public function setAccountConfirmationToken(?string $confirmation_token): self
-    {
-        $this->account_confirmation_token = $confirmation_token;
-
-        return $this;
-    }
-
-    /**
-     * @return DateTimeInterface|null
-     * @author bernard-ng <ngandubernard@gmail.com>
-     */
-    public function getAccountConfirmedAt(): ?DateTimeInterface
-    {
-        return $this->account_confirmed_at;
-    }
-
-    /**
-     * @param DateTimeInterface|null $account_confirmed_at
-     * @return $this
-     * @author bernard-ng <ngandubernard@gmail.com>
-     */
-    public function setAccountConfirmedAt(?DateTimeInterface $account_confirmed_at): self
-    {
-        $this->account_confirmed_at = $account_confirmed_at;
-
-        return $this;
-    }
-
-    /**
      * @return bool|null
      * @author bernard-ng <ngandubernard@gmail.com>
      */
@@ -499,17 +444,6 @@ class User implements UserInterface
             }
         }
 
-        return $this;
-    }
-
-    /**
-     * @return $this
-     * @author bernard-ng <ngandubernard@gmail.com>
-     */
-    public function setAccountConfirmed(): self
-    {
-        $this->setAccountConfirmationToken(null);
-        $this->setAccountConfirmedAt(new DateTime());
         return $this;
     }
 }

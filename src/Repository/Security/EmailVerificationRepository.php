@@ -3,7 +3,9 @@
 namespace App\Repository\Security;
 
 use App\Entity\Security\EmailVerification;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -19,32 +21,22 @@ class EmailVerificationRepository extends ServiceEntityRepository
         parent::__construct($registry, EmailVerification::class);
     }
 
-    // /**
-    //  * @return EmailVerification[] Returns an array of EmailVerification objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param User $user
+     * @return EmailVerification|null
+     * @author bernard-ng <ngandubernard@gmail.com>
+     */
+    public function findLastRequestForUser(User $user): ?EmailVerification
     {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('e.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        try {
+            return $this->createQueryBuilder('ev')
+                ->where('ev.user = :user')
+                ->setParameter('user', $user)
+                ->setMaxResults(1)
+                ->getQuery()
+                ->getOneOrNullResult();
+        } catch (NonUniqueResultException $e) {
+            return null;
+        }
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?EmailVerification
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

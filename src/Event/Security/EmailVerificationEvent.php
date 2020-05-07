@@ -7,24 +7,31 @@ namespace App\Event\Security;
 use App\Entity\User;
 
 /**
- * Class AccountRegisteredEvent
+ * Class EmailVerificationEvent
  * @package App\Event\Security
  * @author bernard-ng <ngandubernard@gmail.com>
  */
-final class AccountRegisteredEvent
+class EmailVerificationEvent
 {
-    private User $user;
-    private $data;
 
     /**
-     * AccountRegisteredEvent constructor.
-     * @param User $user
-     * @param mixed $data
+     * @var User
      */
-    public function __construct(User $user, $data)
+    private User $user;
+    /**
+     * @var string
+     */
+    private string $email;
+
+    /**
+     * EmailVerificationEvent constructor.
+     * @param User $user
+     * @param string $email
+     */
+    public function __construct(User $user, string $email)
     {
         $this->user = $user;
-        $this->data = $data;
+        $this->email = $email;
     }
 
     /**
@@ -36,10 +43,10 @@ final class AccountRegisteredEvent
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getData()
+    public function getEmail(): string
     {
-        return $this->data;
+        return $this->email;
     }
 }

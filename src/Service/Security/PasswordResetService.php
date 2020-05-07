@@ -22,7 +22,6 @@ use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
  */
 class PasswordResetService
 {
-    private const PASSWORD_RESET_ROUTE = 'app_auth_password_reset_confirm';
 
     private UserRepository $repository;
     private TokenGeneratorInterface $tokenGenerator;
@@ -72,6 +71,8 @@ class PasswordResetService
                     ->setToken($this->tokenGenerator->generateToken());
                 $this->manager->persist($token);
                 $this->manager->flush();
+
+                // TODO: send an email with the confirmation token
             } catch (\Exception $e) {
                 $this->logger->error($e->getMessage(), $e->getTrace());
             }

@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Security\{TokenExpiredException, UserNotFoundException, TokenNotFoundException};
 use App\Data\Security\{PasswordResetConfirmData, PasswordResetRequestData};
-use App\Form\Security\{PasswordResetConfirmType, PasswordResetRequestType};
+use App\Form\Security\{PasswordResetConfirmForm, PasswordResetRequestForm};
 use App\Event\Security\{PasswordResetRequestEvent, PasswordResetConfirmEvent};
 
 /**
@@ -44,7 +44,7 @@ class PasswordResetController extends AbstractController
     public function request(Request $request): Response
     {
         $data = new PasswordResetRequestData();
-        $form = $this->createForm(PasswordResetRequestType::class, $data);
+        $form = $this->createForm(PasswordResetRequestForm::class, $data);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -75,7 +75,7 @@ class PasswordResetController extends AbstractController
     {
         try {
             $data = new PasswordResetConfirmData();
-            $form = $this->createForm(PasswordResetConfirmType::class, $data);
+            $form = $this->createForm(PasswordResetConfirmForm::class, $data);
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {

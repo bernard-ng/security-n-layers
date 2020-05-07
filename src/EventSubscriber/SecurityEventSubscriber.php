@@ -4,16 +4,22 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
-use App\Event\Security\PasswordResetConfirmEvent;
-use App\Event\Security\PasswordResetRequestEvent;
-use App\Service\Security\AuthenticationService;
-use App\Event\Security\AccountRegisteredEvent;
-use App\Event\Security\AuthenticationSuccessEvent;
-use App\Service\Security\TokenNotFoundException;
-use App\Service\Security\LoginService;
-use App\Service\Security\PasswordResetService;
-use App\Service\Security\TokenExpiredException;
-use App\Service\Security\UserNotFoundException;
+use App\Event\Security\{
+    EmailVerificationEvent,
+    PasswordResetConfirmEvent,
+    PasswordResetRequestEvent,
+    RegistrationRequestEvent,
+    AuthenticationSuccessEvent
+};
+use App\Service\Security\{
+    AuthenticationService,
+    TokenNotFoundException,
+    LoginService,
+    PasswordResetService,
+    TokenExpiredException,
+    TooManyEmailChangeException,
+    UserNotFoundException
+};
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -30,20 +36,21 @@ class SecurityEventSubscriber implements EventSubscriberInterface
     {
         return [
             AuthenticationSuccessEvent::class => 'onAuthenticationSuccess',
-            AccountRegisteredEvent::class => 'onAccountRegistered',
+            RegistrationRequestEvent::class => 'onRegistrationRequest',
             PasswordResetRequestEvent::class => 'onPasswordResetRequest',
-            PasswordResetConfirmEvent::class => 'onPasswordResetConfirm'
+            PasswordResetConfirmEvent::class => 'onPasswordResetConfirm',
+            EmailVerificationEvent::class => 'onEmailVerification',
         ];
     }
 
     /**
-     * @param AccountRegisteredEvent $event
+     * @param RegistrationRequestEvent $event
      * @param AuthenticationService $service
      * @author bernard-ng <ngandubernard@gmail.com>
      */
-    public function onAccountRegistered(AccountRegisteredEvent $event, AuthenticationService $service): void
+    public function onRegistrationRequest(RegistrationRequestEvent $event, AuthenticationService $service): void
     {
-        $service->register($event->getUser(), $event->getData());
+        $service->register($event->getData());
     }
 
     /**
@@ -54,6 +61,17 @@ class SecurityEventSubscriber implements EventSubscriberInterface
     public function onAuthenticationSuccess(AuthenticationSuccessEvent $event, LoginService $service): void
     {
         $service->register($event->getUser(), $event->getRequest());
+    }
+
+    /**
+     * @param EmailVerificationEvent $event
+     * @param AuthenticationService $service
+     * @throws TooManyEmailChangeException
+     * @author bernard-ng <ngandubernard@gmail.com>
+     */
+    public function onEmailVerification(EmailVerificationEvent $event, AuthenticationService $service)
+    {
+        $service->verification($event->getUser(), $event->getEmail());
     }
 
     /**

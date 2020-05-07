@@ -117,8 +117,6 @@ class AppAuthenticatorService extends AbstractFormLoginAuthenticator implements 
 
         if (!$user) {
             throw new CustomUserMessageAuthenticationException('Email could not be found.');
-        } elseif (is_null($user->getAccountConfirmedAt())) {
-            throw new CustomUserMessageAuthenticationException('Please, check your email to confirm your account');
         }
 
         return $user;

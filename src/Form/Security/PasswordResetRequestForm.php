@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * @package App\Form\Security
  * @author bernard-ng <ngandubernard@gmail.com>
  */
-class PasswordResetRequestType extends AbstractType
+class PasswordResetRequestForm extends AbstractType
 {
 
     /**
