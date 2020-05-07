@@ -1,13 +1,17 @@
 langage: php
 php:
     - '7.4'
+node:
+    - '12.16'
 
 install:
-    - composer install
+    - make install
 
 cache:
     directories:
         - ./vendor
 
 script:
-    - php vendor/bin/phpcs -s
+    - make lint
+    - php bin/console lint:yaml /config
+    - php bin/console lint:twig /templates
