@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class RegistrationData
- * @UniqueEntity("name", repositoryMethod="findBy", entityClass="App\Enity\User")
+ * @UniqueEntity("name", repositoryMethod="findBy", entityClass="App\Entity\User")
  * @UniqueEntity("email", repositoryMethod="findBy", entityClass="App\Entity\User")
  * @package App\Data\Security
  * @author bernard-ng <ngandubernard@gmail.com>
@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RegistrationData
 {
     /**
-     * @Assert\Regex("[a-z0-9_]+")
+     * @Assert\Regex("#[a-z0-9_]+#")
      * @Assert\NotBlank()
      */
     public string $name = '';

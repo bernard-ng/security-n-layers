@@ -29,6 +29,26 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class SecurityEventSubscriber implements EventSubscriberInterface
 {
 
+    private LoginService $loginService;
+    private PasswordResetService $passwordResetService;
+    private AuthenticationService $authenticationService;
+
+    /**
+     * SecurityEventSubscriber constructor.
+     * @param LoginService $loginService
+     * @param PasswordResetService $passwordResetService
+     * @param AuthenticationService $authenticationService
+     */
+    public function __construct(
+        LoginService $loginService,
+        PasswordResetService $passwordResetService,
+        AuthenticationService $authenticationService
+    ) {
+        $this->loginService = $loginService;
+        $this->passwordResetService = $passwordResetService;
+        $this->authenticationService = $authenticationService;
+    }
+
     /**
      * @inheritDoc
      */
@@ -45,55 +65,50 @@ class SecurityEventSubscriber implements EventSubscriberInterface
 
     /**
      * @param RegistrationRequestEvent $event
-     * @param AuthenticationService $service
      * @author bernard-ng <ngandubernard@gmail.com>
      */
-    public function onRegistrationRequest(RegistrationRequestEvent $event, AuthenticationService $service): void
+    public function onRegistrationRequest(RegistrationRequestEvent $event): void
     {
-        $service->register($event->getData());
+        $this->authenticationService->register($event->getData());
     }
 
     /**
      * @param AuthenticationSuccessEvent $event
-     * @param LoginService $service
      * @author bernard-ng <ngandubernard@gmail.com>
      */
-    public function onAuthenticationSuccess(AuthenticationSuccessEvent $event, LoginService $service): void
+    public function onAuthenticationSuccess(AuthenticationSuccessEvent $event): void
     {
-        $service->register($event->getUser(), $event->getRequest());
+        $this->loginService->register($event->getUser(), $event->getRequest());
     }
 
     /**
      * @param EmailVerificationEvent $event
-     * @param AuthenticationService $service
      * @throws TooManyEmailChangeException
      * @author bernard-ng <ngandubernard@gmail.com>
      */
-    public function onEmailVerification(EmailVerificationEvent $event, AuthenticationService $service)
+    public function onEmailVerification(EmailVerificationEvent $event)
     {
-        $service->verification($event->getUser(), $event->getEmail());
+        $this->authenticationService->verification($event->getUser(), $event->getEmail());
     }
 
     /**
      * @param PasswordResetConfirmEvent $event
-     * @param PasswordResetService $service
      * @throws TokenExpiredException
      * @throws TokenNotFoundException
      * @author bernard-ng <ngandubernard@gmail.com>
      */
-    public function onPasswordResetConfirm(PasswordResetConfirmEvent $event, PasswordResetService $service): void
+    public function onPasswordResetConfirm(PasswordResetConfirmEvent $event): void
     {
-        $service->confirm($event->getUser(), $event->getToken(), $event->getData());
+        $this->passwordResetService->confirm($event->getUser(), $event->getToken(), $event->getData());
     }
 
     /**
      * @param PasswordResetRequestEvent $event
-     * @param PasswordResetService $service
      * @throws UserNotFoundException
      * @author bernard-ng <ngandubernard@gmail.com>
      */
-    public function onPasswordResetRequest(PasswordResetRequestEvent $event, PasswordResetService $service): void
+    public function onPasswordResetRequest(PasswordResetRequestEvent $event): void
     {
-        $service->reset($event->getData());
+        $this->passwordResetService->reset($event->getData());
     }
 }
