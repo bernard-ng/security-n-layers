@@ -2,7 +2,7 @@
 
 namespace App\Form\Security;
 
-use App\Data\Security\PasswordResetData;
+use App\Data\Security\PasswordResetConfirmData;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
@@ -54,7 +54,7 @@ class PasswordResetConfirmType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => PasswordResetData::class
+            'data_class' => PasswordResetConfirmData::class
         ]);
     }
 }

@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -31,11 +32,15 @@ class User implements UserInterface
     private string $uid;
 
     /**
+     * @Assert\Email()
+     * @Assert\NotBlank()
      * @ORM\Column(type="string", length=180, unique=true)
      */
     private ?string $email = null;
 
     /**
+     * @Assert\NotBlank()
+     * @Assert\Regex("[a-z0-9_]+")
      * @ORM\Column(type="string", length=255, unique=true)
      */
     private ?string $name = null;
@@ -52,6 +57,7 @@ class User implements UserInterface
     private ?string $roles = "ROLE_USER";
 
     /**
+     * @Assert\Length(min="10")
      * @ORM\Column(type="text", nullable=true)
      */
     private ?string $description = null;
@@ -75,16 +81,6 @@ class User implements UserInterface
      * @ORM\Column(type="datetime", nullable=true)
      */
     private ?DateTimeInterface $account_confirmed_at = null;
-
-    /**
-     * @ORM\Column(type="string", length=70, nullable=true)
-     */
-    private ?string $password_reset_token = null;
-
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private ?DateTimeInterface $password_reset_at = null;
 
     /**
      * @ORM\Column(type="boolean", options={"default": 0})
@@ -338,48 +334,6 @@ class User implements UserInterface
     }
 
     /**
-     * @return string|null
-     * @author bernard-ng <ngandubernard@gmail.com>
-     */
-    public function getPasswordResetToken(): ?string
-    {
-        return $this->password_reset_token;
-    }
-
-    /**
-     * @param string|null $password_reset_token
-     * @return $this
-     * @author bernard-ng <ngandubernard@gmail.com>
-     */
-    public function setPasswordResetToken(?string $password_reset_token): self
-    {
-        $this->password_reset_token = $password_reset_token;
-
-        return $this;
-    }
-
-    /**
-     * @return DateTimeInterface|null
-     * @author bernard-ng <ngandubernard@gmail.com>
-     */
-    public function getPasswordResetAt(): ?DateTimeInterface
-    {
-        return $this->password_reset_at;
-    }
-
-    /**
-     * @param DateTimeInterface|null $password_reset_at
-     * @return $this
-     * @author bernard-ng <ngandubernard@gmail.com>
-     */
-    public function setPasswordResetAt(?DateTimeInterface $password_reset_at): self
-    {
-        $this->password_reset_at = $password_reset_at;
-
-        return $this;
-    }
-
-    /**
      * @return bool|null
      * @author bernard-ng <ngandubernard@gmail.com>
      */
@@ -555,16 +509,5 @@ class User implements UserInterface
         $this->setAccountConfirmationToken(null);
         $this->setAccountConfirmedAt(new DateTime());
         return $this;
-    }
-
-    /**
-     * @param string $encodePassword
-     * @author bernard-ng <ngandubernard@gmail.com>
-     */
-    public function resetPassword(string $encodePassword)
-    {
-        $this->setPasswordResetToken(null);
-        $this->setPasswordResetAt(new DateTime());
-        $this->setPassword($encodePassword);
     }
 }

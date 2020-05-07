@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @package App\Data\Security
  * @author bernard-ng <ngandubernard@gmail.com>
  */
-class PasswordResetData
+class PasswordResetConfirmData
 {
 
     /**

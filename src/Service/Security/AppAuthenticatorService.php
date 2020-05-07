@@ -1,6 +1,6 @@
 <?php
-
-namespace App\Security;
+declare(strict_types=1);
+namespace App\Service\Security;
 
 use App\Entity\User;
 use App\Event\Security\AuthenticationSuccessEvent;
@@ -28,7 +28,7 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
  * @package App\Security
  * @author bernard-ng <ngandubernard@gmail.com>
  */
-class AppAuthenticator extends AbstractFormLoginAuthenticator implements PasswordAuthenticatedInterface
+class AppAuthenticatorService extends AbstractFormLoginAuthenticator implements PasswordAuthenticatedInterface
 {
     use TargetPathTrait;
 
@@ -42,7 +42,7 @@ class AppAuthenticator extends AbstractFormLoginAuthenticator implements Passwor
     private UserProviderInterface $userProvider;
 
     /**
-     * AppAuthenticationAuthenticator constructor.
+     * AppAuthenticatorService constructor.
      * @param EntityManagerInterface $entityManager
      * @param UrlGeneratorInterface $urlGenerator
      * @param CsrfTokenManagerInterface $csrfTokenManager

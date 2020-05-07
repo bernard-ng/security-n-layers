@@ -3,10 +3,14 @@ declare(strict_types=1);
 
 namespace App\Controller\Security;
 
+use App\Entity\Security\PasswordResetToken;
 use App\Entity\User;
-use App\Event\Security\PasswordResetTokenCreatedEvent;
+use App\Event\Security\PasswordResetConfirmEvent;
+use App\Event\Security\PasswordResetRequestEvent;
 use App\Repository\UserRepository;
-use App\Data\Security\PasswordResetData;
+use App\Data\Security\PasswordResetConfirmData;
+use App\Service\Security\InvalidTokenException;
+use App\Service\Security\UserNotFoundException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,7 +20,6 @@ use App\Form\Security\PasswordResetRequestType;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 
 /**
  * Class ResetPasswordController
@@ -26,82 +29,76 @@ use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 class ResetPasswordController extends AbstractController
 {
 
+    private EventDispatcherInterface $eventDispatcher;
+
+    /**
+     * ResetPasswordController constructor.
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function __construct(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
     /**
      * @param Request $request
-     * @param UserRepository $repository
-     * @param TokenGeneratorInterface $generator
-     * @param EventDispatcherInterface $eventDispatcher
      * @return Response
      * @author bernard-ng <ngandubernard@gmail.com>
      */
-    public function request(
-        Request $request,
-        UserRepository $repository,
-        TokenGeneratorInterface $generator,
-        EventDispatcherInterface $eventDispatcher
-    ): Response {
+    public function request(Request $request): Response
+    {
         $data = new PasswordResetRequestData();
         $form = $this->createForm(PasswordResetRequestType::class, $data);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user = $repository->findOneBy(['email', $data->email]);
-
-            if ($user) {
-                $token = $generator->generateToken();
-                $user->setPasswordResetToken($token);
-                $this->getDoctrine()->getManager()->flush();
-
-                $eventDispatcher->dispatch(new PasswordResetTokenCreatedEvent($user, $token));
+            try {
+                $this->eventDispatcher->dispatch(new PasswordResetRequestEvent($data));
                 $this->addFlash('success', 'auth.account.password.resetRequestSuccess');
+            } catch (UserNotFoundException $e) {
+                $this->addFlash('error', 'auth.account.password.invalidEmail');
+            } finally {
                 return $this->redirectToRoute('app_auth_login');
             }
-
-            $this->addFlash('error', 'auth.account.password.invalidEmail');
-            return $this->redirectToRoute('app_auth_login');
         }
 
-        return $this->render('security/password_reset_request.html.twig', [
+        return $this->render('security/password_reset.html.twig', [
             'form' => $form->createView()
         ]);
     }
 
     /**
-     * @Route("/auth/password/reset/:token", name="app_auth_password_reset", methods={"GET"})
+     * @Route("/auth/password/reset/{id}/{token}", name="app_auth_password_reset", methods={"GET"})
      * @param Request $request
-     * @param string $token
-     * @param UserRepository $repository
-     * @param UserPasswordEncoderInterface $encoder
+     * @param User $user
+     * @param PasswordResetToken $token
      * @return Response
      * @author bernard-ng <ngandubernard@gmail.com>
      */
-    public function reset(
-        Request $request,
-        string $token,
-        UserRepository $repository,
-        UserPasswordEncoderInterface $encoder
-    ): Response {
-        /** @var User $user */
-        $user = $repository->findOneBy(['password_reset_token', $token]);
+    public function reset(Request $request, User $user, PasswordResetToken $token): Response
+    {
+        if ($token->isExpiry() && $token->getUser() !== $user) {
+            $this->addFlash('error', 'auth.account.password.expiredToken');
+            return $this->redirectToRoute('app_auth_login');
+        }
 
-        if ($user) {
-            $data = new PasswordResetData();
+        try {
+            $data = new PasswordResetConfirmData();
             $form = $this->createForm(PasswordResetConfirmType::class, $data);
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
-                $user->resetPassword($encoder->encodePassword($user, $data->password));
-                $this->getDoctrine()->getManager()->flush();
+                $this->eventDispatcher->dispatch(new PasswordResetConfirmEvent($user, $token, $data));
                 $this->addFlash('success', 'auth.account.password.resetProcessSuccess');
                 return $this->redirectToRoute('app_auth_login');
             }
 
-            return $this->render('security/password_reset.html.twig', [
+            return $this->render('security/password_reset_confirm.html.twig', [
                 'form' => $form->createView()
             ]);
+        } catch (InvalidTokenException $e) {
+            $this->addFlash('error', 'auth.account.password.invalidToken');
+            return $this->redirectToRoute('app_auth_login');
         }
-
-        $this->addFlash('error', 'auth.account.password.invalidToken');
-        return $this->redirectToRoute('app_auth_login');
     }
 }

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace App\Event\Security;
 
 use App\Entity\User;
@@ -11,10 +13,17 @@ use App\Entity\User;
 final class AccountRegisteredEvent
 {
     private User $user;
+    private $data;
 
-    public function __construct(User $user)
+    /**
+     * AccountRegisteredEvent constructor.
+     * @param User $user
+     * @param mixed $data
+     */
+    public function __construct(User $user, $data)
     {
         $this->user = $user;
+        $this->data = $data;
     }
 
     /**
@@ -23,5 +32,13 @@ final class AccountRegisteredEvent
     public function getUser(): User
     {
         return $this->user;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getData()
+    {
+        return $this->data;
     }
 }
