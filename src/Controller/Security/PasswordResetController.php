@@ -11,15 +11,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Data\Security\PasswordResetConfirmData;
-use App\Service\Security\TokenExpiredException;
-use App\Service\Security\UserNotFoundException;
-use App\Service\Security\TokenNotFoundException;
-use App\Data\Security\PasswordResetRequestData;
-use App\Form\Security\PasswordResetConfirmType;
-use App\Form\Security\PasswordResetRequestType;
-use App\Event\Security\PasswordResetRequestEvent;
-use App\Event\Security\PasswordResetConfirmEvent;
+use App\Service\Security\{TokenExpiredException, UserNotFoundException, TokenNotFoundException};
+use App\Data\Security\{PasswordResetConfirmData, PasswordResetRequestData};
+use App\Form\Security\{PasswordResetConfirmType, PasswordResetRequestType};
+use App\Event\Security\{PasswordResetRequestEvent, PasswordResetConfirmEvent};
 
 /**
  * Class ResetPasswordController
