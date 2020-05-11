@@ -10,6 +10,7 @@ install:
 cache:
     directories:
         - ./vendor
+        - ./node_modules
 
 script:
     - make lint

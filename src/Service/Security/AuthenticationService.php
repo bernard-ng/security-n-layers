@@ -50,8 +50,7 @@ class AuthenticationService
         UserRepository $repository,
         EmailVerificationRepository $verificationRepository,
         LoggerInterface $logger
-    )
-    {
+    ) {
         $this->manager = $manager;
         $this->eventDispatcher = $eventDispatcher;
         $this->tokenGenerator = $tokenGenerator;
