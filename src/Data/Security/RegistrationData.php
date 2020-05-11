@@ -9,8 +9,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class RegistrationData
- * @UniqueEntity("name", repositoryMethod="findBy", entityClass="App\Entity\User")
- * @UniqueEntity("email", repositoryMethod="findBy", entityClass="App\Entity\User")
+ * UniqueEntity("name", repositoryMethod="findBy", entityClass="App\Entity\User")
+ * UniqueEntity("email", repositoryMethod="findBy", entityClass="App\Entity\User")
  * @package App\Data\Security
  * @author bernard-ng <ngandubernard@gmail.com>
  */

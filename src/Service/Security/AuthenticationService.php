@@ -7,6 +7,7 @@ namespace App\Service\Security;
 use App\Data\Security\RegistrationData;
 use App\Entity\Security\EmailVerification;
 use App\Entity\User;
+use App\Event\Security\EmailVerificationCreatedEvent;
 use App\Event\Security\EmailVerificationEvent;
 use App\Repository\Security\EmailVerificationRepository;
 use App\Repository\UserRepository;
@@ -49,7 +50,8 @@ class AuthenticationService
         UserRepository $repository,
         EmailVerificationRepository $verificationRepository,
         LoggerInterface $logger
-    ) {
+    )
+    {
         $this->manager = $manager;
         $this->eventDispatcher = $eventDispatcher;
         $this->tokenGenerator = $tokenGenerator;
@@ -103,7 +105,7 @@ class AuthenticationService
         $this->manager->persist($emailVerification);
         $this->manager->flush();
 
-        // TODO: send email with the verification token
+        $this->eventDispatcher->dispatch(new EmailVerificationCreatedEvent($user, $emailVerification));
     }
 
     /**
