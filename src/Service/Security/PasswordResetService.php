@@ -8,10 +8,13 @@ use App\Data\Security\PasswordResetConfirmData;
 use App\Data\Security\PasswordResetRequestData;
 use App\Entity\Security\PasswordResetToken;
 use App\Entity\User;
+use App\Event\Security\PasswordResetTokenCreatedEvent;
 use App\Repository\Security\PasswordResetTokenRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 
@@ -29,6 +32,7 @@ class PasswordResetService
     private LoggerInterface $logger;
     private PasswordResetTokenRepository $tokenRepository;
     private UserPasswordEncoderInterface $passwordEncoder;
+    private EventDispatcherInterface $eventDispatcher;
 
     /**
      * PasswordResetService constructor.
@@ -37,6 +41,7 @@ class PasswordResetService
      * @param TokenGeneratorInterface $tokenGenerator
      * @param EntityManagerInterface $manager
      * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param EventDispatcherInterface $eventDispatcher
      * @param LoggerInterface $logger
      */
     public function __construct(
@@ -45,6 +50,7 @@ class PasswordResetService
         TokenGeneratorInterface $tokenGenerator,
         EntityManagerInterface $manager,
         UserPasswordEncoderInterface $passwordEncoder,
+        EventDispatcherInterface $eventDispatcher,
         LoggerInterface $logger
     ) {
         $this->repository = $repository;
@@ -53,6 +59,7 @@ class PasswordResetService
         $this->manager = $manager;
         $this->logger = $logger;
         $this->passwordEncoder = $passwordEncoder;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
 
@@ -72,8 +79,8 @@ class PasswordResetService
                 $this->manager->persist($token);
                 $this->manager->flush();
 
-                // TODO: send an email with the confirmation token
-            } catch (\Exception $e) {
+                $this->eventDispatcher->dispatch(new PasswordResetTokenCreatedEvent($user, $token));
+            } catch (Exception $e) {
                 $this->logger->error($e->getMessage(), $e->getTrace());
             }
         } else {

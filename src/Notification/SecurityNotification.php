@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Notification;
 
 use App\Event\Security\EmailVerificationCreatedEvent;
+use App\Event\Security\PasswordResetTokenCreatedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 
 /**
@@ -38,7 +40,8 @@ class SecurityNotification implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            EmailVerificationCreatedEvent::class => 'onEmailVerificationCreated'
+            EmailVerificationCreatedEvent::class => 'onEmailVerificationCreated',
+            PasswordResetTokenCreatedEvent::class => 'onPasswordResetTokenCreated'
         ];
     }
 
@@ -49,13 +52,32 @@ class SecurityNotification implements EventSubscriberInterface
      */
     public function onEmailVerificationCreated(EmailVerificationCreatedEvent $event)
     {
+        $user = $event->getUser();
         $email = $this->factory->makeFromTemplate('mails/security/email_confirmation.html.twig', [
             'token' => $event->getVerification()->getToken(),
-            'id' => $event->getUser()->getId()
+            'id' => $user->getId()
         ])
-            ->to($event->getVerification()->getEmail())
+            ->to(new Address($event->getVerification()->getEmail(), $user->getName()))
             ->priority(Email::PRIORITY_HIGH)
-            ->subject("Confirmation de votre adresse mail");
+            ->subject("SouvenirCloud - Confirmation de votre adresse mail");
+        $this->mailer->send($email);
+    }
+
+    /**
+     * @param PasswordResetTokenCreatedEvent $event
+     * @throws TransportExceptionInterface
+     * @author bernard-ng <ngandubernard@gmail.com>
+     */
+    public function onPasswordResetTokenCreated(PasswordResetTokenCreatedEvent $event)
+    {
+        $user = $event->getUser();
+        $email = $this->factory->makeFromTemplate('mails/security/password_reset_token.html.twig', [
+            'token' => $event->getToken()->getToken(),
+            'id' => $user->getId()
+        ])
+            ->to(new Address($user->getEmail(), $user->getName()))
+            ->priority(Email::PRIORITY_HIGH)
+            ->subject("SouvenirCloud - Instruction de rappel de mot de passe");
         $this->mailer->send($email);
     }
 }
