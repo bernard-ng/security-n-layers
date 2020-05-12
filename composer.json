@@ -28,6 +28,7 @@
         "symfony/web-link": "5.0.*",
         "symfony/webpack-encore-bundle": "^1.7",
         "symfony/yaml": "5.0.*",
+        "twig/cssinliner-extra": "^3.0",
         "victorybiz/geoip-location": "^1.1"
     },
     "require-dev": {
