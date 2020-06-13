@@ -14,5 +14,5 @@ cache:
 
 script:
     - make lint
-    - php bin/console lint:yaml /config
-    - php bin/console lint:twig /templates
+    - php bin/console lint:yaml config
+    - php bin/console lint:twig templates
