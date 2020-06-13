@@ -5,7 +5,7 @@ node:
     - '12.16'
 
 install:
-    - make install
+    - composer install
 
 cache:
     directories:
